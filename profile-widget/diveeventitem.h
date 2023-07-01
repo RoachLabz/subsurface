@@ -25,10 +25,11 @@ public:
 	static bool isInteresting(const struct dive *d, const struct divecomputer *dc,
 				  const struct event *ev, const struct plot_info &pi,
 				  int firstSecond, int lastSecond);
-
+	const QString text;
+	const QPixmap pixmap;
 private:
-	void setupToolTipString(struct gasmix lastgasmix);
-	void setupPixmap(struct gasmix lastgasmix, const DivePixmaps &pixmaps);
+	QString setupToolTipString(const struct event *ev, struct gasmix lastgasmix);
+	QPixmap setupPixmap(const struct event *ev, struct gasmix lastgasmix, const DivePixmaps &pixmaps) const;
 	void recalculatePos();
 	DiveCartesianAxis *vAxis;
 	DiveCartesianAxis *hAxis;
