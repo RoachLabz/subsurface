@@ -5,6 +5,9 @@ on:
     - scripts/docker/**
     branches:
     - master
+  pull_request:
+    branches:
+    - master
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,7 +25,8 @@ jobs:
       run: |
         bash -x ./scripts/get-atomic-buildnr.sh ${{ github.sha }} ${{ secrets.NIGHTLY_BUILDS }} "CICD-release"
         bash scripts/create-releasenotes.sh ${{ github.event.head_commit.id }}
-        version=$(cat release-version)
+        version=$(<release-version)
+
         echo "version=$version" >> $GITHUB_OUTPUT
 
     # add a file containing the release title so it can be picked up and listed on the release page on our web server
@@ -31,7 +35,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: v${{ steps.version_number.outputs.version }}
-        repository: ${{ github.repository_owner }}/nightly-builds
+        repository: subsurface/nightly-builds
         token: ${{ secrets.NIGHTLY_BUILDS }}
         prerelease: false
         files: release_content_title.txt
