@@ -1,9 +1,13 @@
 name: Windows
 on:
   push:
+    paths-ignore:
+    - scripts/docker/**
     branches:
     - master
   pull_request:
+    paths-ignore:
+    - scripts/docker/**
     branches:
     - master
 
@@ -11,7 +15,7 @@ jobs:
   buildWindows:
     runs-on: ubuntu-latest
     container:
-      image: docker://subsurface/mxe-build-container:3.0.1
+      image: docker://subsurface/mxe-build:3.1.0
 
     steps:
     - name: checkout sources
@@ -27,7 +31,7 @@ jobs:
         cat release-version
         echo
         version=$(cat release-version)
-        echo "version=$version"
+        version=$(cat release-version)
         echo "version=$version" >> $GITHUB_OUTPUT
 
     - name: store dummy version and build number for pull request
@@ -59,7 +63,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: v${{ steps.version_number.outputs.version }}
-        repository: subsurface/nightly-builds
+        repository: ${{ github.repository_owner }}/nightly-builds
         token: ${{ secrets.NIGHTLY_BUILDS }}
         prerelease: false
         fail_on_unmatched_files: true

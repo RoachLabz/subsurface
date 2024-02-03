@@ -1,8 +1,11 @@
 name: Fedora Copr Build
 on:
   push:
+    paths-ignore:
+    - scripts/docker/**
     branches:
     - master
+    - current
 
 jobs:
   setup-build:
@@ -50,5 +53,5 @@ jobs:
     - name: run the copr build script
       run: |
         cd ..
-        bash -x subsurface/packaging/copr/make-package.sh post
+        bash -x subsurface/packaging/copr/make-package.sh ${{ github.ref_name }}
 
