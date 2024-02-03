@@ -25,6 +25,13 @@ jobs:
       id: version_number
       if: github.event_name == 'push'
       run: |
+        bash -x ./scripts/get-atomic-buildnr.sh ${{ github.sha }} ${{ secrets.NIGHTLY_BUILDS }} "CICD-release"
+        echo "in yml we have PWD $(pwd)"
+        ls -l release-version
+        cat release-version
+        echo
+        version=$(cat release-version)
+        echo "version=$version"
         bash ./scripts/get-atomic-buildnr.sh ${{ github.sha }} ${{ secrets.NIGHTLY_BUILDS }} "CICD-release"
         version=$(cat release-version)
         echo "version=$version" >> $GITHUB_OUTPUT
