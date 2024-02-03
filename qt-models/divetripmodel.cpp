@@ -179,7 +179,7 @@ static QString displaySac(const struct dive *d, bool units)
 	if (!d->sac)
 		return QString();
 	QString s = get_volume_string(d->sac, units);
-	return units ? s + gettextFromC::tr("/min") : s;
+	return units ? s + gettextFromC::tr("/min") : std::move(s);
 }
 
 static QString displayWeight(const struct dive *d, bool units)
@@ -1386,7 +1386,7 @@ void DiveTripModelTree::divesSelectedSlot(const QVector<dive *> &divesIn, dive *
 	QVector<QModelIndex> indices;
 	indices.reserve(dives.count());
 
-	processByTrip(dives, [this, &indices] (dive_trip *trip, const QVector<dive *> &divesInTrip)
+	processByTrip(std::move(dives), [this, &indices] (dive_trip *trip, const QVector<dive *> &divesInTrip)
 		      { divesSelectedTrip(trip, divesInTrip, indices); });
 
 	emit divesSelected(indices, diveToIdx(currentDive), currentDC);

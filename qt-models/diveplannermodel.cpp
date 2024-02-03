@@ -523,12 +523,22 @@ void DivePlannerPointsModel::setGFHigh(const int gfhigh)
 	}
 }
 
+int DivePlannerPointsModel::gfHigh() const
+{
+	return diveplan.gfhigh;
+}
+
 void DivePlannerPointsModel::setGFLow(const int gflow)
 {
 	if (diveplan.gflow != gflow) {
 		diveplan.gflow = gflow;
 		emitDataChanged();
 	}
+}
+
+int DivePlannerPointsModel::gfLow() const
+{
+	return diveplan.gflow;
 }
 
 void DivePlannerPointsModel::setRebreatherMode(int mode)
@@ -1312,7 +1322,7 @@ void DivePlannerPointsModel::createPlan(bool replanCopy)
 			disclaimerBegin = disclaimer.left(disclaimerMid);
 			disclaimerEnd = disclaimer.mid(disclaimerMid + 2);
 		} else {
-			disclaimerBegin = disclaimer;
+			disclaimerBegin = std::move(disclaimer);
 		}
 		int disclaimerPositionStart = oldnotes.indexOf(disclaimerBegin);
 		if (disclaimerPositionStart >= 0) {

@@ -1273,7 +1273,7 @@ void MainWindow::setTitle()
 	setWindowTitle("Subsurface: " + displayedFilename(existing_filename) + unsaved + shown);
 }
 
-void MainWindow::importFiles(const QStringList fileNames)
+void MainWindow::importFiles(const QStringList &fileNames)
 {
 	if (fileNames.isEmpty())
 		return;
@@ -1289,7 +1289,7 @@ void MainWindow::importFiles(const QStringList fileNames)
 	Command::importDives(&log, IMPORT_MERGE_ALL_TRIPS, source);
 }
 
-void MainWindow::loadFiles(const QStringList fileNames)
+void MainWindow::loadFiles(const QStringList &fileNames)
 {
 	if (fileNames.isEmpty()) {
 		refreshDisplay();
@@ -1354,12 +1354,11 @@ void MainWindow::on_actionImportDiveLog_triggered()
 			logFiles.append(fn);
 	}
 
-	if (logFiles.size()) {
+	if (logFiles.size())
 		importFiles(logFiles);
-	}
 
 	if (csvFiles.size()) {
-		DiveLogImportDialog diveLogImport(csvFiles, this);
+		DiveLogImportDialog diveLogImport(std::move(csvFiles), this);
 		diveLogImport.exec();
 	}
 }
@@ -1553,9 +1552,8 @@ void MainWindow::hideProgressBar()
 	}
 }
 
-void MainWindow::divesChanged(const QVector<dive *> &dives, DiveField field)
+void MainWindow::divesChanged(const QVector<dive *> &dives, DiveField)
 {
-	Q_UNUSED(field)
 	for (struct dive *d: dives) {
 		qDebug() << "dive #" << d->number << "changed, cache is" << (dive_cache_is_valid(d) ? "valid" : "invalidated");
 		// a brute force way to deal with that would of course be to call
