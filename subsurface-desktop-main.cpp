@@ -214,25 +214,53 @@ exit:
 	}
 }
 
-// install this message handler primarily so that the Windows build can log to files
-void messageHandler(QtMsgType type, const QMessageLogContext &, const QString &msg)
-{
-	QByteArray localMsg = msg.toUtf8();
-	switch (type) {
-	case QtDebugMsg:
-		fprintf(stdout, "%s\n", localMsg.constData());
-		break;
-	case QtInfoMsg:
-		fprintf(stdout, "%s\n", localMsg.constData());
-		break;
-	case QtWarningMsg:
-		fprintf(stderr, "%s\n", localMsg.constData());
-		break;
-	case QtCriticalMsg:
-		fprintf(stderr, "%s\n", localMsg.constData());
-		break;
-	case QtFatalMsg:
-		fprintf(stderr, "%s\n", localMsg.constData());
-		abort();
-	}
+// Advanced message handler
+void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+    QByteArray localMsg = msg.toUtf8();
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
+    QString logMessage = QString("[%1] %2: %3").arg(timestamp);
+
+    switch (type) {
+    case QtDebugMsg:
+        logMessage = logMessage.arg("DEBUG").arg(localMsg.constData());
+        break;
+    case QtInfoMsg:
+        logMessage = logMessage.arg("INFO").arg(localMsg.constData());
+        break;
+    case QtWarningMsg:
+        logMessage = logMessage.arg("WARNING").arg(localMsg.constData());
+        break;
+    case QtCriticalMsg:
+        logMessage = logMessage.arg("CRITICAL").arg(localMsg.constData());
+        break;
+    case QtFatalMsg:
+        logMessage = logMessage.arg("FATAL").arg(localMsg.constData());
+        abort();
+    }
+
+    // Print to console
+    if (type == QtWarningMsg || type == QtCriticalMsg || type == QtFatalMsg) {
+        fprintf(stderr, "%s\n", logMessage.toLocal8Bit().constData());
+    } else {
+        fprintf(stdout, "%s\n", logMessage.toLocal8Bit().constData());
+    }
+
+    // Write to log file (Windows-specific)
+#ifdef _WIN32
+    if (logFile.isOpen()) {
+        QTextStream out(&logFile);
+        out << logMessage << '\n';
+    }
+#endif
+}
+
+// Function to close the log file (Windows-specific)
+void closeLogFile() {
+#ifdef _WIN32
+    if (logFile.isOpen()) {
+        QTextStream out(&logFile);
+        out << "=== Application End: " << QDateTime::currentDateTime().toString(Qt::ISODate) << " ===\n";
+        logFile.close();
+    }
+#endif
 }
